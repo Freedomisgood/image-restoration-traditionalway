@@ -3,13 +3,15 @@
 # @Author  : Mrli
 # @FileName: main.py
 # @Blog    : https://nymrli.top/
+import numpy as np
+from copy import deepcopy
+import random
+
 from utils import (read_image,
                    plot_image,
                    Filter,
                    NoiseGenerator,
-                   noise_mask_image,
                    normalization)
-import numpy as np
 
 
 def get_noise_mask(noise_img):
@@ -20,6 +22,31 @@ def get_noise_mask(noise_img):
     """
     # 将图片数据矩阵只包含 0和1,如果不能等于 0 则就是 1。
     return np.array(noise_img != 0, dtype='double')
+
+
+def noise_mask_image(img, noise_ratio):
+    """
+    根据题目要求生成受损图片
+    :param img: 图像矩阵，一般为 np.ndarray, 图像矩阵值 0-1 之间
+    :param noise_ratio: 噪声比率，可能值是0.4/0.6/0.8
+    :return: noise_img 受损图片, 图像矩阵值 0-1 之间，数据类型为 np.array,
+             数据类型对象 (dtype): np.double, 图像形状:(height,width,channel),通道(channel) 顺序为RGB
+    """
+    # 受损图片初始化
+    noise_img = None
+    # -------------实现受损图像答题区域-----------------
+    # TODO: 没过测试
+    noise_img = deepcopy(img)
+    h, w = img.shape[: 2]  # h为图片的长, w为图片的宽
+    for dh in range(h):  # 遍历每行
+        cols = range(w)
+        mask_indexes = random.sample(cols, int(w * noise_ratio))
+        pixel_list = [0 if i in mask_indexes else 1 for i in cols]
+        for c in cols:
+            noise_img[dh, c, :] = noise_img[dh, c, :] * pixel_list[c]
+    # -----------------------------------------------
+    noise_img = np.array(noise_img, dtype='double')
+    return noise_img
 
 
 def restore_image(noise_img, size=4):
@@ -39,6 +66,7 @@ def restore_image(noise_img, size=4):
     # -------------实现图像恢复代码答题区域----------------------------
     input_im = res_img * 255
     res_img = Filter(k=size-1).process(input_im)
+    res_img = np.array(res_img / 255, dtype="double")
     # ---------------------------------------------------------------
 
     return res_img
@@ -54,7 +82,7 @@ if __name__ == '__main__':
     # print(noised_im)
     # print("生成成功!")
 
-    # 测试工程下所有文件
+    # 测试工程下所有图片
     # import os
     # f = Filter(k=3)
     # for root, dirs, files in os.walk(".", topdown=False):

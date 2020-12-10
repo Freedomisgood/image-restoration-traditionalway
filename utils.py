@@ -7,7 +7,7 @@ import cv2
 import random
 import numpy as np
 import matplotlib.pyplot as plt
-from copy import deepcopy
+
 
 def read_image(img_path):
     """
@@ -78,6 +78,18 @@ def plot_image(image, image_title, is_axis=False):
     plt.show()
 
 
+def normalization(image):
+    """
+    将数据线性归一化
+    :param image: 图片矩阵，一般是np.array 类型
+    :return: 将归一化后的数据，在（0,1）之间
+    """
+    # 获取图片数据类型对象的最大值和最小值
+    info = np.iinfo(image.dtype)
+    # 图像数组数据放缩在 0-1 之间
+    return image.astype(np.double) / info.max
+
+
 class NoiseGenerator:
     @staticmethod
     def add_pulse_noise(im, noise_ratios=0.3):
@@ -108,7 +120,7 @@ class NoiseGenerator:
         :return:
         """
         # image = np.array(im / 255, dtype=float)   # 将像素值归一
-        image = NoiseGenerator._normalization(im)   # 将像素值归一
+        image = normalization(im)   # 将像素值归一
         noise = np.random.normal(mean, var ** 0.5, image.shape)  # 产生高斯噪声
         noised_im = image + noise  # 直接将归一化的图片与噪声相加
         def clip_img(noised_im):
@@ -234,37 +246,4 @@ class Filter:
         return repaired_im
 
 
-def normalization(image):
-    """
-    将数据线性归一化
-    :param image: 图片矩阵，一般是np.array 类型
-    :return: 将归一化后的数据，在（0,1）之间
-    """
-    # 获取图片数据类型对象的最大值和最小值
-    info = np.iinfo(image.dtype)
-    # 图像数组数据放缩在 0-1 之间
-    return image.astype(np.double) / info.max
 
-
-def noise_mask_image(img, noise_ratio):
-    """
-    根据题目要求生成受损图片
-    :param img: 图像矩阵，一般为 np.ndarray
-    :param noise_ratio: 噪声比率，可能值是0.4/0.6/0.8
-    :return: noise_img 受损图片, 图像矩阵值 0-1 之间，数据类型为 np.array,
-             数据类型对象 (dtype): np.double, 图像形状:(height,width,channel),通道(channel) 顺序为RGB
-    """
-    # 受损图片初始化
-    noise_img = None
-    # -------------实现受损图像答题区域-----------------
-    noise_img = deepcopy(img)
-    h, w = img.shape[: 2]  # h为图片的长, w为图片的宽
-    for dh in range(h):  # 遍历每行
-        cols = range(w)
-        mask_indexes = random.sample(cols, int(w * noise_ratio))
-        pixel_list = [0 if i in mask_indexes else 1 for i in cols]
-        for c in cols:
-            noise_img[dh, c, :] = noise_img[dh, c, :] * pixel_list[c]
-    # -----------------------------------------------
-    noise_img = np.array(noise_img, dtype='double')
-    return noise_img

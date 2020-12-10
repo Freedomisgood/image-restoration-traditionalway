@@ -1,6 +1,10 @@
 # image-restoration-traditionalway
 
 > homework for ZJU: https://mo.zju.edu.cn/homework/zju_ai_2020_ss
+>
+> :o: 图像修复
+>
+> :x:TODO: 噪声生成
 
 # **习题3** - 图像恢复
 
@@ -763,3 +767,14 @@ def show_photo(pic_path):
 
 ![test_clip](./pics/test_clip.png)
 
+## 图像相似度指标
+
+###  SSIM（结构相似性度量）
+
+> 这是一种全参考的图像质量评价指标，分别从亮度、对比度、结构三个方面度量图像相似性。SSIM取值范围[0, 1]，值越大，表示图像失真越小。
+
+### cosin相似度（余弦相似度）
+
+> 把图片表示成一个向量，通过计算向量之间的余弦距离来表征两张图片的相似度。
+
+https://blog.csdn.net/u010977034/article
